@@ -78,6 +78,13 @@ def index():
     response = url.json()
     print(response["help"])
     print("Fields:")
-    print(response["result"]["resource_id"])
+    print("Resource de id:"+response["result"]["resource_id"])
+    print("Quantidade de campos que esta resoure tem:"+str(len(response["result"]["fields"])-1))
+    print("Dicionário de dados desta resource")
+    for field in range(1, len(response["result"]["fields"])): # Começa a contar a partir de um para pular um item do dicionário
+        print("Campos desta resource:"+str(response["result"]["fields"][field]["id"]))
+        print("Campos desta resource:"+str(response["result"]["fields"][field]))
+        print("Descrição:"+str(response["result"]["fields"][field]["info"]['notes']))
+
 
     return render_template('index.html', titulo='Frictionless demo', datasets=ds_list, header=header, portal=portal)
