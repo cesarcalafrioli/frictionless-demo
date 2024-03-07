@@ -39,7 +39,11 @@
                <td>{{ dataset.dataset_id }}</td>
                <td>{{ dataset.titulo }}</td>
                <td>{{ dataset.qtd_resource }}</td>
-               <td>Visualizar</td>
+               <td>
+                  <a href="{{ url_for('main.dataset', dataset_id=dataset.dataset_id) }}">
+                     Visualizar
+                  </a>
+               </td>
             </tr>
             {% endfor %}
          </tbody>
