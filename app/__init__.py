@@ -5,6 +5,8 @@ from config import Config # Importa a classe de configuração Config do arquivo
 def create_app(config_class=Config): # Função factory do aplicativo Flask. Cria uma instância de aplicação chamada app
     app = Flask(__name__)
     app.config.from_object(config_class)
+    app.config['SECRET_KEY'] = 'your secret key'
+
 
     # Register blueprints here
     from app.main import bp as main_bp

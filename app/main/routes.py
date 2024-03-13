@@ -7,32 +7,24 @@ from frictionless import Package
 import requests
 import json
 
+from app.main.forms import SearchForm
+
 OPEN_DATA_PORTAL = 'https://dados.ufpe.br/dataset/'
 
 # Extrai as informações do portal de dados abertos
 class Portal:
     def __init__(self, url):
         self.url = url
-        #self.datasets = []
-        self.datasets2 = []
+        self.datasets_list = []
 
         response_package = requests.get('http://{}/api/action/package_list'.format(url)).json()
         self.qtd_datasets = len(response_package["result"])
 
-        print(self.qtd_datasets)
+        #print(self.qtd_datasets)
         for dataset in range(len(response_package["result"])):
-            print(dataset)
-            #self.datasets.append(response_package["result"][dataset]) # Aqui salva apenas o id do conjunto de dados para posterior busca
-            self.datasets2.append(Dataset(self.url, response_package["result"][dataset]))
-
-        
-        # TESTE - DATASETS
-        #print("Lista dos conjuntos de dados aos quais pertencem a este portal: "+str(self.datasets))
-        #print("Informação do primeiro conjunto de dados instanciado")
-        #print("----------------------------------------------------")
-        #print("Título: "+self.datasets2[0].titulo)
-        #print("Quantidade de resources: "+str(self.datasets2[0].qtd_resource))
-        
+         #   print(dataset)
+            self.datasets_list.append(Dataset(self.url, response_package["result"][dataset]))
+   
 
 # Extrai as informações do Conjunto de dados
 class Dataset():
@@ -41,13 +33,7 @@ class Dataset():
     def dataset_resources_id(self):
         """ Lista os resources de uma determinada Package"""
         """ OBS: Os nomes de cada resource estão em Package, não em Resource"""
-        #dataset_resources =[self.__dataset_response["result"]["resources"] for resource_id in range(self.__qtd_resources)]
         dataset_resources = self.__dataset_response["result"]["resources"]
-        print("------------------------------------------------------------------")
-        #dataset_resources_id = [self.__dataset_response["result"]["resources"][resource_id]["id"] for resource_id in range(self.__qtd_resources)]
-        #dataset_resources_name = [self.__dataset_response["result"]["resources"][resource_id]["name"] for resource_id in range(self.__qtd_resources)]
-        #print(dataset_resources_name)
-        #return 
         return dataset_resources
 
     def __init__(self, url, dataset_id):
@@ -55,12 +41,9 @@ class Dataset():
         self.__url = url
         self.__dataset_id = dataset_id
         self.__dataset_response = requests.get('https://{}/api/3/action/package_show?id={}'.format(url, dataset_id)).json()
+        #self.__dataset_response = requests.get('https://dados.ufpe.br/api/3/action/package_show?id=boletim-oficial').json()
         self.__dataset_title = self.__dataset_response["result"]["title"]
         self.__qtd_resources = len(self.__dataset_response["result"]["resources"])
-        # REMOVER DEPOIS - TRECHO ABAIXO JÁ APLICADO ACIMA
-        #print("Lista de id de resources")
-        #for resource_id in range(self.__qtd_resources):
-        #    print(self.__dataset_response["result"]["resources"][resource_id]["id"]+"-"+self.__dataset_response["result"]["resources"][resource_id]["name"])
 
     @property
     def url(self):
@@ -133,52 +116,29 @@ class Resource(Package):
     def resource_name(self, resource_fields):
         self.__resource_fields = resource_fields
         
-@bp.route('/', methods=['GET'])
+@bp.route('/', methods=('GET','POST'))
 def index():
-    header = "Frictionless - Demo"
-
-    portal = Portal('dados.ufpe.br')
-
-    ds_list = portal.datasets2
-
-    # TESTE - ANALISANDO UM RESOURCE EM PARTICULAR ###
-
-    """
-    url = requests.get('https://dados.ufpe.br/api/3/action/datastore_search?resource_id=cd9e4b1b-b1bc-47a5-9055-7ccdf31a072a')
-    response = url.json()
-    print(response["help"])
-    print("Fields:")
-    print("Resource de id:"+response["result"]["resource_id"])
-    print("Quantidade de campos que esta resoure tem:"+str(len(response["result"]["fields"])-1))
-    print("Dicionário de dados desta resource")
-    for field in range(1, len(response["result"]["fields"])): # Começa a contar a partir de um para pular um item do dicionário
-        print("Campos desta resource:"+str(response["result"]["fields"][field]["id"]))
-        print("Campos desta resource:"+str(response["result"]["fields"][field]))
-        print("Descrição:"+str(response["result"]["fields"][field]["info"]['notes']))
-    ###################################################
-    """
+    header = "CKAN - Demo"
     
-    return render_template('index.html', titulo='Frictionless demo', datasets=ds_list, header=header, portal=portal)
+    form = SearchForm()
+    print(form.validate_on_submit())
+    if form.validate_on_submit():
+        
+        portal = Portal(form.url.data.replace('https://',""))
+        ds_list = portal.datasets_list
     
-    #dataset = Dataset('www.tesourotransparente.gov.br/ckan','cauc')
+        return render_template('index.html', titulo=header, form=form, datasets=ds_list, portal=portal)
+        
+    return render_template('index.html', titulo=header, form=form)
 
-    #print("URL:"+dataset.url)
-    #print("Dataset ID:"+dataset.dataset_id)
-    #print("Response URL: {}".format(dataset.dataset_response))
-    #print("Nome do conjunto de dados: {}".format(dataset.dataset_title))
-    #print("Quantidade de resources neste conjunto de dados: {}".format(dataset.qtd_resources))
-    #print("Lista de resources deste conjunto de dados: {}".format(dataset.dataset_resources_id))
-    #return render_template('test.html')
-    
-    
+
 # Exibindo informações de um dataset
-@bp.route('/<string:dataset_id>/', methods=('GET','POST'))
-def dataset(dataset_id):
-    header = "Frictionless - Demo"
+@bp.route('/<string:url>/<string:dataset_id>/', methods=('GET','POST'))
+def dataset(dataset_id, url):
+    header = "CKAN - Demo"
 
-
-    dataset = Dataset('dados.ufpe.br',dataset_id)
-
+    dataset = Dataset(url,dataset_id)
     resources = dataset.dataset_resources_id
+    print(dataset.dataset_resources_id)
 
-    return render_template('dataset.html', resources=resources, dataset=dataset)   
+    return render_template('dataset.html', resources=resources, dataset=dataset, header=header)   

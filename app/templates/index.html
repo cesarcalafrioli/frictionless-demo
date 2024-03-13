@@ -4,23 +4,36 @@
 
   <div class="container">
       <div class="page-header">
-         <h1>{{ header }}</h1>
+         <h1>{{ titulo }}</h1>
       </div>
       <div class="p-4">
-         <p>Demonstração do uso da framework Frictionless para extrair informações de determinado portal de dados abertos construído sobre a arquitetura CKAN</p>
+         <p>Demonstração do acesso a API dos portais de dados abertos construídos utilizando a plataforma CKAN</p>
       </div>
 
-
-      <form action="" class="form-group">
-         <div class="form-group">
-            <input class="form-control" type="text" name="search" placeholder="Nome do portal de dados abertos CKAN" required="1">
-         </div>
-
-         <button type="submit" class="btn btn-primary mb-2">
-            <i class="bi bi-search me-2"></i> Search
-         </button>
-      </form>
       
+      <form method="POST" action="/">
+         {{ form.csrf_token }}
+         <p>
+            <p>
+            {{ form.url.label }}
+            </p>
+            {{ form.url(size=100)}}
+         </p>
+
+         {% if form.url.errors %}
+         <ul class="errors">
+             {% for error in form.url.errors %}
+                 <li>{{ error }}</li>
+             {% endfor %}
+         </ul>
+         {% endif %}
+
+         <p>
+            <input type="submit" value="Pesquisar">
+         </p>
+      </form>
+
+      {% if portal %}
       <div class="p-4">
          <p>O portal {{ portal.url }} possui {{ portal.qtd_datasets}} conjuntos de dados</p>
       </div>
@@ -40,11 +53,12 @@
                <td>{{ dataset.dataset_title }}</td>
                <td>{{ dataset.qtd_resources }}</td>
                <td>
-                  <a href="{{ url_for('main.dataset', dataset_id=dataset.dataset_id) }}">
+                  <a href="{{ url_for('main.dataset', dataset_id=dataset.dataset_id, url=portal.url) }}">
                      Visualizar
                   </a>
                </td>
             </tr>
             {% endfor %}
          </tbody>
+      {% endif %}
 {% endblock %}

@@ -1,3 +1,4 @@
+{% extends 'shared/base.html' %}
 
 {% block content %}
 
@@ -6,22 +7,22 @@
             <h1>{{ header }}</h1>
         </div>
 
-<tbody>
-    <table class="table table-striped table-responsive table-bordered">
-        <thead class="thead-default">
-           <tr>
-              <th>Nome do resource</th>
-              <th>Formato</th>
-          </tr>
-        </thead>
         <tbody>
-            {% for resource_item in resources %}
-            <tr>
-                <td>{{ resource_item.name }}</td>
-                <td>{{ resource_item.format }}</td>
-                </tr></br>
-            {% endfor %}
+            <table class="table table-striped table-responsive table-bordered">
+                <thead class="thead-default">
+                <tr>
+                    <th>Nome do resource</th>
+                    <th>Formato</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for resource_item in resources %}
+                    <tr>
+                        <td>{{ resource_item.name }}</td>
+                        <td>{{ resource_item.format }}</td>
+                        </tr></br>
+                    {% endfor %}
+                </tbody>
+                <a href="/">Voltar</a>
         </tbody>
-        <a href="/">Voltar</a>
- </tbody>
 {% endblock %}
