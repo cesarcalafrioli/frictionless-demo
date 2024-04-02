@@ -1,6 +1,9 @@
 ---
 name: Requisição de features
 about: Requisite uma feature
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
