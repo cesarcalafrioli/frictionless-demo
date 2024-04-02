@@ -3,9 +3,5 @@ description: Guided issue forms test
 title: "[Prefix] "
 labels: ["bug", "help wanted"]
 assignees: ["cesarcalafrioli"]
-body:
-  - type: markdown
-  attributes:
-    values: |
-      Please fill out the sections below to help us reproduce
+
   
