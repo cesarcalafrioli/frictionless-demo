@@ -1,0 +1,10 @@
+site:
+  title: CKAN Demo - Manual
+counter:
+  type: plausible
+  code: cesarcalafrioli.github.io/frictionless-demo/
+pages:
+  items:
+    - path: docs/index
+      name: Introdução
+    
